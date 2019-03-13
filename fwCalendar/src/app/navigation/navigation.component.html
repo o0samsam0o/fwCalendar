@@ -1,0 +1,22 @@
+<app-toolbar [isLogin]="false"></app-toolbar>
+
+<mat-sidenav-container class="sidenav-container">
+  <mat-sidenav
+    #drawer
+    class="sidenav mat-elevation-z2"
+    [attr.role]="(isHandset$ | async) ? 'dialog' : 'navigation'"
+    [mode]="(isHandset$ | async) ? 'over' : 'side'"
+    [opened]="!(isHandset$ | async)">
+
+    <mat-nav-list>
+      <a mat-list-item [routerLink]="[ 'calendar/main' ]" routerLinkActive="active">
+        <mat-icon fxFlex="20">calendar_today</mat-icon>
+        <span>{{'CALENDAR' | translate}}</span>
+      </a>
+    </mat-nav-list>
+  </mat-sidenav>
+
+  <mat-sidenav-content class="sidenav-content" fxLayout="column">
+    <router-outlet></router-outlet>
+  </mat-sidenav-content>
+</mat-sidenav-container>

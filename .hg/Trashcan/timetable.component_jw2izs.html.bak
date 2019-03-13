@@ -1,0 +1,52 @@
+<mat-card class="timetable-card">
+  <mat-card-title>
+    <span>{{'NEW_TIMETABLE' | translate }}</span>
+  </mat-card-title>
+  <mat-card-content fxLayout="row" fxLayoutAlign="start start" fxLayoutGap="30px">
+    <form (ngSubmit)="submit()" [formGroup]="timetableFormGroup" fxLayout="column" fxFlex="50">
+      <mat-form-field fxFlex="100">
+        <input matInput type="text" name="listTitle" placeholder="Titel hinzufügen" formControlName="title" required>
+      </mat-form-field>
+
+      <mat-form-field>
+        <input matInput [matDatepicker]="startDatePicker" placeholder="Start Date" formControlName="start">
+        <mat-datepicker-toggle matSuffix [for]="startDatePicker"></mat-datepicker-toggle>
+        <mat-datepicker #startDatePicker></mat-datepicker>
+      </mat-form-field>
+
+      <app-cron-jobs [(ngModel)]="timetable.recurrence" [ngModelOptions]="{standalone: true}" [config]="cronConfig"></app-cron-jobs>
+
+      <!-- Ende -->
+      <div fxLayout="column" fxLayoutAlign="start start">
+        <div>Ende</div>
+        <mat-radio-group [(ngModel)]="selectedEndOption" name="selectedEnd" fxLayout="column">
+          <mat-radio-button class="fw-radio-button" fxLayout="row" *ngFor="let end of endOptions | enumToArray"
+                            [value]="end">
+            <div fxLayout="row" fxLayoutGap="20px">
+              <span fxLayoutAlign="start center">{{end | translate}}</span>
+
+              <mat-form-field fxFlex *ngIf="end === endOptions[endOptions.ON]">
+                <input matInput [matDatepicker]="endDatePicker" placeholder="End Date" [formControl]="timetable.end">
+                <mat-datepicker-toggle matSuffix [for]="endDatePicker"></mat-datepicker-toggle>
+                <mat-datepicker #endDatePicker></mat-datepicker>
+              </mat-form-field>
+
+              <div *ngIf="end === endOptions[endOptions.AFTER]" fxLayoutGap="15px">
+                <mat-form-field fxFlex="50px">
+                  <input matInput type="number" [(ngModel)]="numberOfRepTimes" min="1" name="numberOfRepTimes">
+                </mat-form-field>
+                <div fxFlexAlign="center">{{'TIMES' | translate}}</div>
+              </div>
+            </div>
+          </mat-radio-button>
+        </mat-radio-group>
+      </div>
+    </form>
+
+    <div id='timetable' fxFlex="50"></div>
+  </mat-card-content>
+  <mat-card-actions fxLayoutAlign="end end">
+    <button mat-button color="primary" onclick="submit()">{{'SAVE' | translate}}</button>
+    <span style="width: 16px"></span>
+  </mat-card-actions>
+</mat-card>

@@ -1,0 +1,38 @@
+<mat-toolbar color="primary">
+  <button
+    type="button"
+    aria-label="Toggle sidenav"
+    mat-icon-button
+    (click)="drawer.toggle()"
+    *ngIf="isHandset$ | async">
+    <mat-icon aria-label="Side nav toggle icon">menu</mat-icon>
+  </button>
+
+  <span>{{'SYSTEM_CONFIGURATION_CENTER' | translate}}</span>
+  <span fxFlex></span>
+  <mat-form-field>
+    <mat-select [(ngModel)]="selectedLanguage" (ngModelChange)="changeLanguage($event)">
+      <mat-option *ngFor="let language of languages" [value]="language.abr">
+        {{language.lang | translate}}
+      </mat-option>
+    </mat-select>
+  </mat-form-field>
+
+  <div *ngIf="!isLogin">
+    <button mat-icon-button matTooltip="{{'ROLES'| translate}}">
+      <mat-icon attr.aria-label="{{'ROLES'| translate}}">settings</mat-icon>
+    </button>
+    <button mat-icon-button matTooltip="{{'USERS'| translate}}">
+      <mat-icon attr.aria-label="{{'USERS'| translate}}">person</mat-icon>
+    </button>
+    <button mat-icon-button matTooltip="{{'COMPUTER'| translate}}">
+      <mat-icon attr.aria-label="{{ 'COMPUTER' | translate }}">computer</mat-icon>
+    </button>
+    <button mat-icon-button matTooltip="{{'TODOS'| translate}}">
+      <mat-icon attr.aria-label="{{ 'TODOS' | translate }}">notifications_none</mat-icon>
+    </button>
+    <button mat-icon-button matTooltip="{{'LOGOUT'| translate}}" (click)="logout()">
+      <mat-icon attr.aria-label="{{ 'LOGOUT' | translate }}">power_settings_new</mat-icon>
+    </button>
+  </div>
+</mat-toolbar>

@@ -1,0 +1,103 @@
+import {Component, OnInit, AfterViewInit} from '@angular/core';
+
+import 'fullcalendar';
+import {moment} from 'fullcalendar';
+
+import {EventDialogComponent} from './event-dialog/event-dialog.component';
+
+import {MatDialog} from '@angular/material';
+import {CalendarService} from './calendar.service';
+import {Timetable} from './timetable';
+import {map, toArray} from 'rxjs/operators';
+
+@Component({
+  selector: 'app-timetable',
+  templateUrl: './calendar.component.html',
+  styleUrls: ['./calendar.component.scss']
+})
+export class CalendarComponent implements OnInit, AfterViewInit {
+
+  calendarElement: any;
+  title: string;
+  timetables: Timetable[];
+
+  constructor(public dialog: MatDialog,
+              protected calendarService: CalendarService) {
+  }
+
+  ngOnInit() {
+    this.getTimetables();
+  }
+
+  ngAfterViewInit() {
+    const self = this;
+    this.calendarElement = $('#calendar');
+
+    this.calendarElement.fullCalendar({
+      height: 'parent',
+      defaultView: 'agendaWeek',
+      locale: 'de',
+      handleWindowResize: true,
+      timeFormat: 'H:mm', // uppercase H for 24-hour clock
+      slotLabelFormat: [
+        'dd DD MMMM YYYY ',
+        'H:mm'
+      ],
+      slotEventOverlap: false,
+      allDaySlot: false,
+      editable: false,
+      buttonText: {
+        today: 'Heute',
+        month: 'Monat',
+        week: 'Woche',
+        day: 'Tag',
+        list: 'Liste'
+      },
+      now: moment(),
+      nowIndicator: true,
+      scrollTime: '08:00', // undo default 6am scrollTime
+      header: {
+        left: 'today prev,next',
+        center: 'title',
+        right: 'agendaDay,agendaWeek,month,listWeek'
+      },
+      eventClick: function (calEvent) {
+        self.openEventDialog(calEvent);
+      },
+      businessHours: {
+        // days of week. an array of zero-based day of week integers (0=Sunday)
+        dow: [1, 2, 3, 4, 5], // Monday - Friday
+
+        start: '09:00', // a start time (10am in this example)
+        end: '18:00', // an end time (6pm in this example)
+      },
+      eventSources: this.timetables
+    });
+  }
+
+  openEventDialog(calEvent): void {
+
+    const dialogRef = this.dialog.open(EventDialogComponent, {
+      panelClass: 'fw-align-right',
+      width: 'Auto',
+      data: {event: calEvent}
+    });
+
+    dialogRef.afterClosed().subscribe(result => {
+      calEvent = result.event;
+      this.calendarElement.fullCalendar('updateEvent', calEvent);
+    });
+
+  }
+
+  getTimetables(): void {
+    this.calendarService.getTimetables()
+      .subscribe(
+        data => this.timetables = data,
+        error => console.log('getTimetables ' + error),
+        () => {
+          this.calendarElement.fullCalendar('addEventSource', this.timetables);
+        });
+  }
+}
+

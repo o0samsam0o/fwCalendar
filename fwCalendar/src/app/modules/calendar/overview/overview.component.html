@@ -1,0 +1,56 @@
+<div class="calOverview" fxLayout="row" fxLayoutAlign="start start" fxLayoutGap="15px">
+  <div fxLayout="column">
+    <app-datepicker></app-datepicker>
+    <mat-divider class="margin"></mat-divider>
+    <div class="margin"></div>
+    <!--<button mat-raised-button routerLink="daylist">neue Tagesliste hinzufügen</button>-->
+
+    <div class="mat-elevation-z2">
+      <mat-toolbar [fxShow]="showSearchBar" color="accent" fxLayoutAlign="space-between center">
+        <mat-form-field>
+          <input matInput (keyup)="applyFilter($event.target.value)" placeholder="Filter">
+          <mat-icon matSuffix (click)="showSearchBar = false">close</mat-icon>
+        </mat-form-field>
+      </mat-toolbar>
+
+      <mat-toolbar color="accent" fxLayoutAlign="space-between center" [fxHide]="showSearchBar">
+        <span>{{ 'CAMERAS' | translate}}</span>
+        <button mat-icon-button matTooltip="{{'SEARCH'| translate}}" (click)="showSearchBar = true">
+          <mat-icon attr.aria-label="{{'SEARCH'| translate}}">search</mat-icon>
+        </button>
+      </mat-toolbar>
+
+      <table mat-table [dataSource]="cameras" matSort>
+        <!-- Checkbox Column -->
+        <ng-container matColumnDef="select">
+          <!--<th mat-header-cell *matHeaderCellDef>
+            <mat-checkbox (change)="$event ? masterToggle() : null"
+                          [checked]="selection.hasValue() && isAllSelected()"
+                          [indeterminate]="selection.hasValue() && !isAllSelected()">
+            </mat-checkbox>
+          </th>-->
+          <td mat-cell *matCellDef="let row">
+            <mat-checkbox (click)="$event.stopPropagation()"
+                          (change)="$event ? selection.toggle(row) : null; updateOverview(selection, row)"
+                          [checked]="selection.isSelected(row)">
+            </mat-checkbox>
+          </td>
+        </ng-container>
+
+        <ng-container matColumnDef="name">
+          <!--<th mat-header-cell *matHeaderCellDef mat-sort-header> {{ 'NAME' | translate }}</th>-->
+          <td mat-cell *matCellDef="let element"> {{element.name}}</td>
+        </ng-container>
+
+        <!--<tr mat-header-row *matHeaderRowDef="displayedColumns; sticky: true"></tr>-->
+        <tr mat-row *matRowDef="let row; columns: displayedColumns;" (click)="selection.toggle(row); updateOverview(selection, row)"></tr>
+      </table>
+
+    </div>
+  </div>
+  <mat-card fxFlex class="calendar-card">
+    <mat-card-content>
+      <div id='calendar'></div>
+    </mat-card-content>
+  </mat-card>
+</div>

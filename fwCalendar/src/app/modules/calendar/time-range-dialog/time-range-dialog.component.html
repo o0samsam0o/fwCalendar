@@ -1,0 +1,37 @@
+<form [formGroup]="timeRangeInfoForm" (ngSubmit)="submit()">
+  <div mat-dialog-content id="dialog">
+    <div fxLayout="column">
+      <div fxLayout="row" fxLayoutGap="15px">
+        <mat-form-field fxFlex>
+          <mat-label>{{'START_TIME' | translate}}</mat-label>
+          <input matInput [ngxTimepicker]="startTimePicker" [format]="24" formControlName="start" [readonly]="!isEditable">
+          <ngx-material-timepicker #startTimePicker></ngx-material-timepicker>
+        </mat-form-field>
+      </div>
+
+      <div fxLayout="row" fxLayoutGap="15px">
+        <mat-form-field fxFlex>
+          <mat-label>{{'END_TIME' | translate}}</mat-label>
+          <input matInput [ngxTimepicker]="endTimePicker" [format]="24" formControlName="end" [readonly]="!isEditable">
+          <ngx-material-timepicker #endTimePicker></ngx-material-timepicker>
+        </mat-form-field>
+      </div>
+    </div>
+  </div>
+
+  <div mat-dialog-actions fxLayoutAlign="end end">
+    <button mat-button color="primary" *ngIf="isEditable"
+            [disabled]="!timeRangeInfoForm.valid" type="submit">{{'SAVE' | translate}}
+    </button>
+    <button mat-button color="primary" *ngIf="isEditable"
+            (click)="delete()">{{'DELETE' | translate}}
+    </button>
+    <button mat-button color="primary" *ngIf="!isEditable"
+            (click)="close()">{{'CLOSE' | translate}}
+    </button>
+    <button mat-button color="primary" *ngIf="isEditable"
+            (click)="close()">{{'CANCEL' | translate}}
+    </button>
+  </div>
+</form>
+

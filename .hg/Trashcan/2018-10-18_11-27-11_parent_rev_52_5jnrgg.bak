@@ -1,0 +1,345 @@
+diff --git a/fwCalendar/src/app/calendar/calendar.component.ts b/fwCalendar/src/app/calendar/calendar.component.ts
+--- a/fwCalendar/src/app/calendar/calendar.component.ts
++++ b/fwCalendar/src/app/calendar/calendar.component.ts
+@@ -6,7 +6,9 @@
+ import {EventDialogComponent} from './event-dialog/event-dialog.component';
+ 
+ import {MatDialog} from '@angular/material';
+-import {EventService} from '../event.service';
++import {CalendarService} from './calendar.service';
++import {Timetable} from './timetable';
++import {map, toArray} from 'rxjs/operators';
+ 
+ @Component({
+   selector: 'app-timetable',
+@@ -17,7 +19,5 @@
+ 
+   calendarElement: any;
+   title: string;
+-  location: string;
+-  eventData: any;
+-  resourceData: any;
++  timetables: Timetable[];
+ 
+@@ -23,5 +23,6 @@
+ 
+-  constructor(public dialog: MatDialog, protected eventService: EventService) {
++  constructor(public dialog: MatDialog,
++              protected calendarService: CalendarService) {
+   }
+ 
+   ngOnInit() {
+@@ -25,13 +26,7 @@
+   }
+ 
+   ngOnInit() {
+-    this.eventService.getEvents().subscribe(data => {
+-      this.eventData = data;
+-    });
+-
+-    this.eventService.getResources().subscribe(data => {
+-      this.resourceData = data;
+-    });
++    this.getTimetables();
+   }
+ 
+   ngAfterViewInit() {
+@@ -76,7 +71,7 @@
+         start: '09:00', // a start time (10am in this example)
+         end: '18:00', // an end time (6pm in this example)
+       },
+-      events: this.eventData
++      eventSources: this.timetables
+     });
+   }
+ 
+@@ -94,4 +89,14 @@
+     });
+ 
+   }
++
++  getTimetables(): void {
++    this.calendarService.getTimetables()
++      .subscribe(
++        data => this.timetables = data,
++        error => console.log('getTimetables ' + error),
++        () => {
++          this.calendarElement.fullCalendar('addEventSource', this.timetables);
++        });
++  }
+ }
+@@ -97,1 +102,2 @@
+ }
++
+diff --git a/fwCalendar/src/app/calendar/cron/cron-jobs/cron-jobs.component.ts b/fwCalendar/src/app/calendar/cron/cron-jobs/cron-jobs.component.ts
+--- a/fwCalendar/src/app/calendar/cron/cron-jobs/cron-jobs.component.ts
++++ b/fwCalendar/src/app/calendar/cron/cron-jobs/cron-jobs.component.ts
+@@ -12,7 +12,6 @@
+ import {ControlValueAccessor, FormBuilder, FormControl, FormGroup, NG_VALUE_ACCESSOR} from '@angular/forms';
+ import {Subject, Observable} from 'rxjs';
+ 
+-
+ import {PosixService} from '../services/posix.service';
+ 
+ @Component({
+diff --git a/fwCalendar/src/app/calendar/timetable/timetable.component.html b/fwCalendar/src/app/calendar/timetable/timetable.component.html
+--- a/fwCalendar/src/app/calendar/timetable/timetable.component.html
++++ b/fwCalendar/src/app/calendar/timetable/timetable.component.html
+@@ -1,12 +1,10 @@
+ <mat-card class="timetable-card">
+-  <form (ngSubmit)="submit()" #timetableForm="ngForm">
+-    <mat-card-title>
+-      <span>{{'NEW_TIMETABLE' | translate }}</span>
+-    </mat-card-title>
+-    <mat-card-content fxLayout="row" fxLayoutAlign="start start" fxLayoutGap="30px">
+-      <form fxFlex="50" fxLayout="column">
+-        <mat-form-field fxFlex="100">
+-          <input matInput type="text" name="listTitle" placeholder="Titel hinzufügen" [(ngModel)]="list.listName"
+-                 #listTitle="ngModel" required>
+-        </mat-form-field>
++  <mat-card-title>
++    <span>{{'NEW_TIMETABLE' | translate }}</span>
++  </mat-card-title>
++  <mat-card-content fxLayout="row" fxLayoutAlign="start start" fxLayoutGap="30px">
++    <form (ngSubmit)="submit()" [formGroup]="timetableFormGroup" fxLayout="column" fxFlex="50">
++      <mat-form-field fxFlex="100">
++        <input matInput type="text" name="listTitle" placeholder="Titel hinzufügen" formControlName="title" required>
++      </mat-form-field>
+ 
+@@ -12,7 +10,7 @@
+ 
+-        <mat-form-field>
+-          <input matInput [matDatepicker]="startDatePicker" placeholder="Start Date" [formControl]="startDate">
+-          <mat-datepicker-toggle matSuffix [for]="startDatePicker"></mat-datepicker-toggle>
+-          <mat-datepicker #startDatePicker></mat-datepicker>
+-        </mat-form-field>
++      <mat-form-field>
++        <input matInput [matDatepicker]="startDatePicker" placeholder="Start Date" formControlName="start">
++        <mat-datepicker-toggle matSuffix [for]="startDatePicker"></mat-datepicker-toggle>
++        <mat-datepicker #startDatePicker></mat-datepicker>
++      </mat-form-field>
+ 
+@@ -18,3 +16,3 @@
+ 
+-        <app-cron-jobs [(ngModel)]="freq" [ngModelOptions]="{standalone: true}" [config]="cronConfig"></app-cron-jobs>
++      <app-cron-jobs [(ngModel)]="timetable.recurrence" [ngModelOptions]="{standalone: true}" [config]="cronConfig"></app-cron-jobs>
+ 
+@@ -20,10 +18,10 @@
+ 
+-        <!-- Ende -->
+-        <div fxLayout="column" fxLayoutAlign="start start">
+-          <span>Ende</span>
+-          <mat-radio-group [(ngModel)]="selectedEndOption" name="selectedEnd" fxLayout="column">
+-            <mat-radio-button class="fw-radio-button" fxLayout="row" *ngFor="let end of endOptions | enumToArray"
+-                              [value]="end">
+-              <div fxLayout="row" fxLayoutGap="20px">
+-                <span fxLayoutAlign="start center">{{end | translate}}</span>
++      <!-- Ende -->
++      <div fxLayout="column" fxLayoutAlign="start start">
++        <div>Ende</div>
++        <mat-radio-group [(ngModel)]="selectedEndOption" name="selectedEnd" fxLayout="column">
++          <mat-radio-button class="fw-radio-button" fxLayout="row" *ngFor="let end of endOptions | enumToArray"
++                            [value]="end">
++            <div fxLayout="row" fxLayoutGap="20px">
++              <span fxLayoutAlign="start center">{{end | translate}}</span>
+ 
+@@ -29,7 +27,7 @@
+ 
+-                <mat-form-field fxFlex *ngIf="end === endOptions[endOptions.ON]">
+-                  <input matInput [matDatepicker]="endDatePicker" placeholder="End Date" [formControl]="endDate">
+-                  <mat-datepicker-toggle matSuffix [for]="endDatePicker"></mat-datepicker-toggle>
+-                  <mat-datepicker #endDatePicker></mat-datepicker>
+-                </mat-form-field>
++              <mat-form-field fxFlex *ngIf="end === endOptions[endOptions.ON]">
++                <input matInput [matDatepicker]="endDatePicker" placeholder="End Date" [formControl]="timetable.end">
++                <mat-datepicker-toggle matSuffix [for]="endDatePicker"></mat-datepicker-toggle>
++                <mat-datepicker #endDatePicker></mat-datepicker>
++              </mat-form-field>
+ 
+@@ -35,8 +33,7 @@
+ 
+-                <div *ngIf="end === endOptions[endOptions.AFTER]">
+-                  <mat-form-field>
+-                    <input matInput type="number" [(ngModel)]="numberOfRepTimes" min="1" name="numberOfRepTimes">
+-                  </mat-form-field>
+-                  <span>Terminen</span>
+-                </div>
++              <div *ngIf="end === endOptions[endOptions.AFTER]" fxLayoutGap="15px">
++                <mat-form-field fxFlex="50px">
++                  <input matInput type="number" [(ngModel)]="numberOfRepTimes" min="1" name="numberOfRepTimes">
++                </mat-form-field>
++                <div fxFlexAlign="center">{{'TIMES' | translate}}</div>
+               </div>
+@@ -42,13 +39,14 @@
+               </div>
+-            </mat-radio-button>
+-          </mat-radio-group>
+-        </div>
+-      </form>
+-      <div id='timetable' fxFlex="50"></div>
+-    </mat-card-content>
+-    <mat-card-actions fxLayoutAlign="end end">
+-      <button mat-button color="primary" type="submit">SAVE</button>
+-      <span style="width: 16px"></span>
+-    </mat-card-actions>
+-  </form>
++            </div>
++          </mat-radio-button>
++        </mat-radio-group>
++      </div>
++    </form>
++
++    <div id='timetable' fxFlex="50"></div>
++  </mat-card-content>
++  <mat-card-actions fxLayoutAlign="end end">
++    <button mat-button color="primary" onclick="submit()">{{'SAVE' | translate}}</button>
++    <span style="width: 16px"></span>
++  </mat-card-actions>
+ </mat-card>
+diff --git a/fwCalendar/src/app/calendar/timetable/timetable.component.ts b/fwCalendar/src/app/calendar/timetable/timetable.component.ts
+--- a/fwCalendar/src/app/calendar/timetable/timetable.component.ts
++++ b/fwCalendar/src/app/calendar/timetable/timetable.component.ts
+@@ -1,5 +1,5 @@
+ import {Component, OnInit, AfterViewInit} from '@angular/core';
+-import {FormControl, Validators} from '@angular/forms';
++import {FormBuilder, FormControl, FormGroup, Validators} from '@angular/forms';
+ 
+ import 'fullcalendar';
+ import {moment} from 'fullcalendar';
+@@ -7,9 +7,7 @@
+ import {EventDialogComponent} from '../event-dialog/event-dialog.component';
+ import {MatDialog} from '@angular/material';
+ 
+-import {ITimetableList} from '../../shared/interfaces';
+-
+ import {v4 as uuid} from 'uuid';
+ import {CronJobsConfig, CronJobsValidationConfig} from '../cron/contracts';
+ import {EndOptionType} from './contracts';
+ 
+@@ -12,7 +10,13 @@
+ import {v4 as uuid} from 'uuid';
+ import {CronJobsConfig, CronJobsValidationConfig} from '../cron/contracts';
+ import {EndOptionType} from './contracts';
+ 
++import {Action, Timetable, Event} from '../timetable';
++import {CalendarService} from '../calendar.service';
++import {ActivatedRoute} from '@angular/router';
++import {Location} from '@angular/common';
++
++
+ @Component({
+   selector: 'app-timetable',
+   templateUrl: './timetable.component.html',
+@@ -20,4 +24,6 @@
+ })
+ export class TimetableComponent implements OnInit, AfterViewInit {
+ 
++  timetable: Timetable;
++  timetableFormGroup: FormGroup;
+   timetableElement: any;
+@@ -23,4 +29,4 @@
+   timetableElement: any;
+-  eventData: any;
++  events: Event[];
+ 
+   endOptions = EndOptionType;
+@@ -25,9 +31,6 @@
+ 
+   endOptions = EndOptionType;
+-  selectedEndOption: EndOptionType;
+-
+-  startDate = new FormControl(new Date());
+-  endDate = new FormControl(new Date());
++  selectedEndOption = this.endOptions[this.endOptions.NEVER];
+ 
+   numberOfRepTimes = 30;
+ 
+@@ -31,24 +34,6 @@
+ 
+   numberOfRepTimes = 30;
+ 
+-  list: ITimetableList =
+-    {
+-      'listId': '',
+-      'listName': '',
+-      'priority': 1,
+-      'startDate': '',
+-      'endDate': '',
+-      'events': [
+-        {
+-          'eventId': '',
+-          'eventName': '',
+-          'action': '',
+-          'startTime': '',
+-          'endTime': ''
+-        }
+-      ]
+-    };
+-
+   freq = '';
+ 
+   freqSec = '';
+@@ -67,7 +52,11 @@
+     validate: true
+   };
+ 
+-  constructor(public dialog: MatDialog) {
++  constructor(private readonly formBuilder: FormBuilder,
++              public dialog: MatDialog,
++              private calendarService: CalendarService,
++              private route: ActivatedRoute,
++              private location: Location) {
+   }
+ 
+   ngOnInit() {
+@@ -71,8 +60,9 @@
+   }
+ 
+   ngOnInit() {
++    this.timetable = new Timetable();
+     this.freqControl = new FormControl();
+     this.freqControl.setValue(this.freqSec);
+     this.freqControl.setValidators([Validators.required]);
+     this.freqControl.valueChanges
+       .subscribe(value => this.freqSec = value);
+@@ -74,8 +64,10 @@
+     this.freqControl = new FormControl();
+     this.freqControl.setValue(this.freqSec);
+     this.freqControl.setValidators([Validators.required]);
+     this.freqControl.valueChanges
+       .subscribe(value => this.freqSec = value);
++
++    this.timetableFormGroup = this.formBuilder.group(this.timetable);
+   }
+ 
+   ngAfterViewInit(): void {
+@@ -109,5 +101,5 @@
+         start: '09:00', // a start time (10am in this example)
+         end: '18:00', // an end time (6pm in this example)
+       },
+-      events: this.eventData
++      events: this.events
+     });
+@@ -113,5 +105,4 @@
+     });
+-
+   }
+ 
+   openEventDialog(calEvent): void {
+@@ -138,5 +129,16 @@
+ 
+   submit() {
+     console.log('submit');
++    console.log(this.timetableFormGroup);
++    // this.addTimetable();
++  }
++
++  goBack(): void {
++    this.location.back();
++  }
++
++  addTimetable(): void {
++    this.calendarService.addTimetable(this.timetable)
++      .subscribe(() => this.goBack());
+   }
+ }

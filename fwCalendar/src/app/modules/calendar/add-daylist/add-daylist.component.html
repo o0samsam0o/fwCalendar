@@ -1,0 +1,88 @@
+<form [formGroup]="daylistForm" class="newDaylistForm" novalidate (ngSubmit)="onDaylistFormSubmit()">
+  <div fxLayout="row" fxLayoutGap="25px">
+    <div fxFlex="50" fxLayout="column">
+      <mat-card>
+        <mat-card-title>{{'ADD_NEW_DAYLIST' | translate}}</mat-card-title>
+        <mat-card-content fxLayout="column">
+          <mat-form-field fxFlex="100">
+            <input matInput type="text" formControlName="name" placeholder="Titel hinzufügen" required>
+          </mat-form-field>
+
+          <mat-card-title>{{'PERIOD' | translate}}</mat-card-title>
+
+          <div fxLayout="column" fxLayoutGap="15px">
+
+            <div formArrayName="validity">
+              <div *ngFor="let val of daylistForm.get('validity').controls; let i=index" formGroupName="{{i}}">
+                <div formArrayName="dateRanges">
+                  <div *ngFor="let dateRange of val.get('dateRanges').controls; let j=index">
+                    <div formGroupName="{{j}}" fxLayout="row" fxLayoutAlign="space-between center">
+                      <mat-form-field fxFlex="45">
+                        <input matInput [matDatepicker]="startDatePicker" placeholder="Start Date"
+                               formControlName="start" name="startDatePicker">
+                        <mat-datepicker-toggle matSuffix [for]="startDatePicker"></mat-datepicker-toggle>
+                        <mat-datepicker #startDatePicker></mat-datepicker>
+                      </mat-form-field>
+
+                      <mat-form-field fxFlex="45">
+                        <input matInput [matDatepicker]="endDatePicker" placeholder="End Date" formControlName="end">
+                        <mat-datepicker-toggle matSuffix [for]="endDatePicker"></mat-datepicker-toggle>
+                        <mat-datepicker #endDatePicker></mat-datepicker>
+                      </mat-form-field>
+
+                      <button mat-icon-button
+                              (click)="deleteDateRange(daylistForm.controls.validity.controls[0].controls.dateRanges, j)">
+                        <mat-icon>clear</mat-icon>
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <button mat-icon-button (click)="addDateRange()">
+            <mat-icon>add</mat-icon>
+          </button>
+
+          <mat-divider [inset]="true"></mat-divider>
+
+          <mat-card-title>{{ 'VALIDITY' | translate }}</mat-card-title>
+
+          <div formArrayName="validity">
+            <div *ngFor="let val of daylistForm.get('validity').controls; let i=index" formGroupName="{{i}}">
+              <div formArrayName="recurrences"
+                   *ngFor="let recurrence of val.get('recurrences').controls; let j = index">
+                <div [formGroupName]="j">
+                  <app-cron-jobs [formControl]="recurrence" [config]="cronConfig"></app-cron-jobs>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div>
+            <button mat-icon-button (click)="addRecurrence()">
+              <mat-icon>add</mat-icon>
+            </button>
+          </div>
+        </mat-card-content>
+
+        <mat-card-actions fxLayoutAlign="end end">
+          <button mat-button type="reset">{{ 'CANCEL' | translate}}</button>
+          <button mat-button color="primary" type="submit" [disabled]="!daylistForm.valid">{{ 'SAVE' | translate}}
+          </button>
+        </mat-card-actions>
+      </mat-card>
+    </div>
+
+    <div fxFlex="50">
+      <mat-card class="daylist-card">
+        <mat-card-content>
+          <!--<pre>{{daylistForm.value | json}}</pre>-->
+          <div id='daylist'></div>
+        </mat-card-content>
+      </mat-card>
+    </div>
+
+  </div>
+</form>

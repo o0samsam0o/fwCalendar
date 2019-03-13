@@ -1,0 +1,144 @@
+import {Component, OnInit, AfterViewInit} from '@angular/core';
+import {FormBuilder, FormControl, FormGroup, Validators} from '@angular/forms';
+
+import 'fullcalendar';
+import {moment} from 'fullcalendar';
+
+import {EventDialogComponent} from '../event-dialog/event-dialog.component';
+import {MatDialog} from '@angular/material';
+
+import {v4 as uuid} from 'uuid';
+import {CronJobsConfig, CronJobsValidationConfig} from '../cron/contracts';
+import {EndOptionType} from './contracts';
+
+import {Action, Timetable, Event} from '../timetable';
+import {CalendarService} from '../calendar.service';
+import {ActivatedRoute} from '@angular/router';
+import {Location} from '@angular/common';
+
+
+@Component({
+  selector: 'app-timetable',
+  templateUrl: './timetable.component.html',
+  styleUrls: ['./timetable.component.scss']
+})
+export class TimetableComponent implements OnInit, AfterViewInit {
+
+  timetable: Timetable;
+  timetableFormGroup: FormGroup;
+  timetableElement: any;
+  events: Event[];
+
+  endOptions = EndOptionType;
+  selectedEndOption = this.endOptions[this.endOptions.NEVER];
+
+  numberOfRepTimes = 30;
+
+  freq = '';
+
+  freqSec = '';
+
+  freqControl: FormControl;
+
+  cronConfig: CronJobsConfig = {
+    multiple: true,
+    option: {
+      minute: false,
+      hour: false
+    }
+  };
+
+  cronValidate: CronJobsValidationConfig = {
+    validate: true
+  };
+
+  constructor(private readonly formBuilder: FormBuilder,
+              public dialog: MatDialog,
+              private calendarService: CalendarService,
+              private route: ActivatedRoute,
+              private location: Location) {
+  }
+
+  ngOnInit() {
+    this.timetable = new Timetable();
+    this.freqControl = new FormControl();
+    this.freqControl.setValue(this.freqSec);
+    this.freqControl.setValidators([Validators.required]);
+    this.freqControl.valueChanges
+      .subscribe(value => this.freqSec = value);
+
+    this.timetableFormGroup = this.formBuilder.group(this.timetable);
+  }
+
+  ngAfterViewInit(): void {
+    const self = this;
+    this.timetableElement = $('#timetable');
+
+    this.timetableElement.fullCalendar({
+      height: 'parent',
+      defaultView: 'agendaDay',
+      locale: 'de',
+      timeFormat: 'H:mm', // uppercase H for 24-hour clock
+      slotLabelFormat: [
+        'dd DD MMMM YYYY ',
+        'H:mm'
+      ],
+      slotEventOverlap: false,
+      allDaySlot: false,
+      header: false,
+      columnHeader: false,
+      nowIndicator: false,
+      editable: true, // enable draggable events
+      scrollTime: '08:00', // undo default 6am scrollTime
+      selectable: true,
+      select: function (startDate, endDate, jsEvent) {
+        self.createNewEvent(startDate, endDate, jsEvent);
+      },
+      eventClick: function (calEvent) {
+        self.openEventDialog(calEvent);
+      },
+      businessHours: {
+        start: '09:00', // a start time (10am in this example)
+        end: '18:00', // an end time (6pm in this example)
+      },
+      events: this.events
+    });
+  }
+
+  openEventDialog(calEvent): void {
+    const dialogRef = this.dialog.open(EventDialogComponent, {
+      panelClass: 'fw-align-right',
+      width: 'Auto',
+      data: {event: calEvent}
+    });
+
+    dialogRef.afterClosed().subscribe(result => {
+      calEvent = result.event;
+      this.timetableElement.fullCalendar('updateEvent', calEvent);
+    });
+  }
+
+  createNewEvent(startDate, endDate, jsEvent): void {
+    this.timetableElement.fullCalendar('renderEvent', {
+      id: uuid(),
+      title: 'new event',
+      start: startDate.format(),
+      end: endDate.format()
+    }, true);
+  }
+
+  submit() {
+    console.log('submit');
+    console.log(this.timetableFormGroup);
+    // this.addTimetable();
+  }
+
+  goBack(): void {
+    this.location.back();
+  }
+
+  addTimetable(): void {
+    this.calendarService.addTimetable(this.timetable)
+      .subscribe(() => this.goBack());
+  }
+}

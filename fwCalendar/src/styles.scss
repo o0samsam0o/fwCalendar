@@ -1,0 +1,179 @@
+/* You can add global styles to this file, and also import other style files */
+@import url('https://fonts.googleapis.com/css?family=Roboto:100,300,400');
+
+body {
+  background-color: #eee;
+  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+  font-size: 16px;
+  line-height: 1.5;
+  font-weight: 300;
+  color: #545454;
+
+  height: 100%;
+  padding: 0px;
+  margin: 0px;
+  overflow: hidden;
+}
+
+.material-icons {
+  font-family: 'Material Icons';
+  font-weight: normal;
+  font-style: normal;
+  font-size: 24px;  /* Preferred icon size */
+  display: inline-block;
+  line-height: 1;
+  text-transform: none;
+  letter-spacing: normal;
+  word-wrap: normal;
+  white-space: nowrap;
+  direction: ltr;
+
+  /* Support for all WebKit browsers. */
+  -webkit-font-smoothing: antialiased;
+  /* Support for Safari and Chrome. */
+  text-rendering: optimizeLegibility;
+
+  /* Support for Firefox. */
+  -moz-osx-font-smoothing: grayscale;
+
+  /* Support for IE. */
+  font-feature-settings: 'liga';
+}
+
+.fc-view-container {
+  color: #999;
+}
+
+.fc-toolbar h2 {
+  font-weight: 300;
+}
+
+::-webkit-scrollbar {
+  height: 6px;
+  width: 6px;
+  background-color: rgba(0, 0, 0, .1);
+  transition: all .2s;
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(0, 0, 0, .15);
+  border-radius: 4px;
+  transition: all .2s;
+}
+
+.margin {
+  margin-bottom: 20px;
+}
+
+.daylist-card {
+  mat-card-content {
+    height: calc(100vh - 240px);
+  }
+}
+
+.calendar-card {
+  mat-card-content {
+    height: calc(100vh - 215px);
+  }
+}
+
+.sidenav-container {
+  height: calc(100vh - 65px);
+}
+
+.sidenav {
+  width: 250px;
+}
+
+.sidenav-content {
+  padding: 25px;
+}
+
+a.active {
+  color: #000;
+}
+
+#dayButtons {
+  .mat-button-toggle-group, .mat-button-toggle-standalone {
+    box-shadow: none;
+    border:none;
+    .mat-button-toggle {
+      display: block;
+      width: 47px;
+      margin: 5px;
+      text-align: center;
+      border-radius: 50px;
+      border: 0.5px solid grey;
+    }
+    .mat-button-toggle-focus-overlay {
+      border-radius: 50px;
+    }
+    .mat-button-toggle-label-content {
+      padding: 0px;
+    }
+    .mat-button-toggle-checked {
+      background-color: #3f51b5;
+      color: white;
+    }
+    .mat-button-toggle-ripple {
+      border-radius: 50px;
+    }
+  }
+}
+
+app-daylist .timetable-card .fc-unthemed td.fc-today {
+  background-color: inherit !important;
+}
+
+.fw-radio-button {
+  margin: 5px;
+}
+
+.newDaylistForm {
+
+  .mat-card-content > :first-child {
+    margin: 20px 0;
+  }
+
+  .mat-card .mat-divider.mat-divider-inset {
+    position: static;
+    margin: 16px auto;
+  }
+}
+
+.removebtn {
+  position: absolute;
+  top: 5px;
+  right: 3px;
+  width: 20px;
+  height: 20px;
+  text-align: center;
+  border-radius: 50%;
+  font-size: 20px;
+  cursor: pointer;
+  background-color: transparent;
+  z-index: 10000;
+  :hover {
+    background-color: blue;
+  }
+}
+
+table {
+  width: 100%;
+}
+
+th.mat-sort-header-sorted {
+  color: black;
+}
+
+.mat-form-field {
+  font-size: 14px;
+}
+
+.calOverview .mat-form-field-infix{
+  width: 153px !important;
+}
+
+.mat-column-select {
+  overflow: initial;
+}

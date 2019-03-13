@@ -1,0 +1,105 @@
+/* You can add global styles to this file, and also import other style files */
+@import url('https://fonts.googleapis.com/css?family=Roboto:100,300,400');
+
+body {
+  background-color: #eee;
+  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+  font-size: 16px;
+  line-height: 1.5;
+  font-weight: 300;
+  color: #545454;
+
+  height: 100%;
+  padding: 0px;
+  margin: 0px;
+  overflow: hidden;
+}
+
+.fc-view-container {
+  color: #999;
+}
+
+.fc-toolbar h2 {
+  font-weight: 300;
+}
+
+::-webkit-scrollbar {
+  height: 6px;
+  width: 6px;
+  background-color: rgba(0, 0, 0, .1);
+  transition: all .2s;
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(0, 0, 0, .15);
+  border-radius: 4px;
+  transition: all .2s;
+}
+
+.margin {
+  margin-bottom: 20px;
+}
+
+.timetable-card {
+  mat-card-content {
+    height: calc(100vh - 300px);
+  }
+}
+
+.calendar-card {
+  mat-card-content {
+    height: calc(100vh - 165px);
+  }
+}
+
+.sidenav-container {
+  height: calc(100vh - 65px);
+}
+
+.sidenav {
+  width: 250px;
+}
+
+.sidenav-content {
+  padding: 25px;
+}
+
+a.active {
+  color: #000;
+}
+
+#dayButtons {
+  .mat-button-toggle-group, .mat-button-toggle-standalone{
+    box-shadow: none;
+    .mat-button-toggle {
+      display: block;
+      width: 36px;
+      margin: 2px;
+      text-align: center;
+      border-radius: 50px;
+    }
+    .mat-button-toggle-focus-overlay{
+      border-radius: 50px;
+    }
+    .mat-button-toggle-label-content {
+      padding: 0px;
+    }
+    .mat-button-toggle-checked {
+      background-color: #3f51b5;
+      color: white;
+    }
+    .mat-button-toggle-ripple {
+      border-radius: 50px;
+    }
+  }
+}
+
+app-timetable .timetable-card .fc-unthemed td.fc-today {
+  background-color: inherit !important;
+}
+
+.fw-radio-button {
+  margin: 5px;
+}
+
+

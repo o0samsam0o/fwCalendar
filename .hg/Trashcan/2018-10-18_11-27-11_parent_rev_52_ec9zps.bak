@@ -1,0 +1,84 @@
+diff --git a/fwCalendar/src/app/calendar/calendar.component.ts b/fwCalendar/src/app/calendar/calendar.component.ts
+--- a/fwCalendar/src/app/calendar/calendar.component.ts
++++ b/fwCalendar/src/app/calendar/calendar.component.ts
+@@ -6,7 +6,9 @@
+ import {EventDialogComponent} from './event-dialog/event-dialog.component';
+ 
+ import {MatDialog} from '@angular/material';
+-import {EventService} from '../event.service';
++import {CalendarService} from './calendar.service';
++import {Timetable} from './timetable';
++import {map, toArray} from 'rxjs/operators';
+ 
+ @Component({
+   selector: 'app-timetable',
+@@ -17,7 +19,5 @@
+ 
+   calendarElement: any;
+   title: string;
+-  location: string;
+-  eventData: any;
+-  resourceData: any;
++  timetables: Timetable[];
+ 
+@@ -23,5 +23,6 @@
+ 
+-  constructor(public dialog: MatDialog, protected eventService: EventService) {
++  constructor(public dialog: MatDialog,
++              protected calendarService: CalendarService) {
+   }
+ 
+   ngOnInit() {
+@@ -25,13 +26,7 @@
+   }
+ 
+   ngOnInit() {
+-    this.eventService.getEvents().subscribe(data => {
+-      this.eventData = data;
+-    });
+-
+-    this.eventService.getResources().subscribe(data => {
+-      this.resourceData = data;
+-    });
++    this.getTimetables();
+   }
+ 
+   ngAfterViewInit() {
+@@ -76,7 +71,7 @@
+         start: '09:00', // a start time (10am in this example)
+         end: '18:00', // an end time (6pm in this example)
+       },
+-      events: this.eventData
++      eventSources: this.timetables
+     });
+   }
+ 
+@@ -94,4 +89,14 @@
+     });
+ 
+   }
++
++  getTimetables(): void {
++    this.calendarService.getTimetables()
++      .subscribe(
++        data => this.timetables = data,
++        error => console.log('getTimetables ' + error),
++        () => {
++          this.calendarElement.fullCalendar('addEventSource', this.timetables);
++        });
++  }
+ }
+@@ -97,1 +102,2 @@
+ }
++
+diff --git a/fwCalendar/src/app/calendar/cron/cron-jobs/cron-jobs.component.ts b/fwCalendar/src/app/calendar/cron/cron-jobs/cron-jobs.component.ts
+--- a/fwCalendar/src/app/calendar/cron/cron-jobs/cron-jobs.component.ts
++++ b/fwCalendar/src/app/calendar/cron/cron-jobs/cron-jobs.component.ts
+@@ -12,7 +12,6 @@
+ import {ControlValueAccessor, FormBuilder, FormControl, FormGroup, NG_VALUE_ACCESSOR} from '@angular/forms';
+ import {Subject, Observable} from 'rxjs';
+ 
+-
+ import {PosixService} from '../services/posix.service';
+ 
+ @Component({
