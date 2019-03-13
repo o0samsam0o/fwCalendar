@@ -12,7 +12,7 @@ import {TimeRange} from '../interfaces';
 })
 
 export class TimeRangeDialogComponent implements OnInit {
-  private isEditable = true;
+  isEditable = true;
   timeRangeInfoForm: FormGroup;
 
   constructor(public dialogRef: MatDialogRef<TimeRangeDialogComponent>,

@@ -28,7 +28,7 @@ export class LoginComponent implements OnInit {
 
   ngOnInit() {
   }
-  
+
   login() {
     this.isLoading = true;
     const val = this.loginForm.value;
