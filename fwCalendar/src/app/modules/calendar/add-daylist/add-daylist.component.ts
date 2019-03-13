@@ -132,7 +132,7 @@ export class AddDaylistComponent implements OnInit, AfterViewInit {
   }
 
   addDateRange(): void {
-    const control = <FormArray>this.daylistForm.get('validity').at(0).get('dateRanges') as FormArray;
+    const control = <FormArray>this.daylistForm.get('validity').get('0').get('dateRanges') as FormArray;
     control.push(this.dateRangeForm());
   }
 
@@ -143,7 +143,7 @@ export class AddDaylistComponent implements OnInit, AfterViewInit {
     this.freqControl.valueChanges
       .subscribe(value => this.freqSec = value);
 
-    const control = <FormArray>this.daylistForm.get('validity').at(0).get('recurrences') as FormArray;
+    const control = <FormArray>this.daylistForm.get('validity').get('0').get('recurrences') as FormArray;
     control.push(this.freqControl);
   }
 

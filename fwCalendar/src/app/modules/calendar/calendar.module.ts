@@ -39,7 +39,7 @@ import { DeleteTimetableComponent } from './delete-timetable/delete-timetable.co
     AddTimetableComponent,
     DeleteTimetableComponent
   ],
-  providers: [AuthGuard]
+  //providers: [AuthGuard]
 })
 export class CalendarModule {
 }

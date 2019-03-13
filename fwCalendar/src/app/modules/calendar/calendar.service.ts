@@ -101,7 +101,7 @@ export class CalendarService {
     return this.http.get<CalEvents[]>(this.calEventsUrl + id)
       .pipe(
         map(val => val),
-        tap(data => console.log(data)),
+       // tap(data => console.log(data)),
         catchError(this.handleError('CalEvents'))
       );
   }
