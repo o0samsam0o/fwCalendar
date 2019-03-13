@@ -96,7 +96,7 @@ export class CalendarService {
         catchError(this.handleError('getEventActions', []))
       );
   }
-
+/*
   getEventActionForCamera(id: number): Observable<CalEvents[]> {
     return this.http.get<CalEvents[]>(this.calEventsUrl + id)
       .pipe(
@@ -105,7 +105,7 @@ export class CalendarService {
         catchError(this.handleError('CalEvents'))
       );
   }
-
+*/
   getAllActions(): Observable<String[]> {
     return this.http.get<String[]>(this.actionUrl)
       .pipe(

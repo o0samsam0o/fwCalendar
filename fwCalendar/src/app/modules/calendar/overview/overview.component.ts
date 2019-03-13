@@ -129,7 +129,7 @@ export class OverviewComponent implements OnInit, AfterViewInit {
   }
 
   getEventActionForCamera(id: number): void {
-    this.calService.getEventActionForCamera(id)
+    /*this.calService.getEventActionForCamera(id)
       .subscribe(
         result => {
           this.calEvents = result;
@@ -139,7 +139,7 @@ export class OverviewComponent implements OnInit, AfterViewInit {
           this.overviewCalElement.fullCalendar('removeEvents');
           this.overviewCalElement.fullCalendar('addEventSource', this.calEvents);
         }
-      );
+      );*/
   }
 
   /** Whether the number of selected elements matches the total number of rows. */
