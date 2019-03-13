@@ -13,9 +13,9 @@
           <div fxLayout="column" fxLayoutGap="15px">
 
             <div formArrayName="validity">
-              <div *ngFor="let val of daylistForm.get('validity').controls; let i=index" formGroupName="{{i}}">
+              <div *ngFor="let val of daylistForm.get('validity')['controls']; let i=index" formGroupName="{{i}}">
                 <div formArrayName="dateRanges">
-                  <div *ngFor="let dateRange of val.get('dateRanges').controls; let j=index">
+                  <div *ngFor="let dateRange of val.get('dateRanges')['controls']; let j=index">
                     <div formGroupName="{{j}}" fxLayout="row" fxLayoutAlign="space-between center">
                       <mat-form-field fxFlex="45">
                         <input matInput [matDatepicker]="startDatePicker" placeholder="Start Date"
@@ -50,9 +50,9 @@
           <mat-card-title>{{ 'VALIDITY' | translate }}</mat-card-title>
 
           <div formArrayName="validity">
-            <div *ngFor="let val of daylistForm.get('validity').controls; let i=index" formGroupName="{{i}}">
+            <div *ngFor="let val of daylistForm.get('validity')['controls']; let i=index" formGroupName="{{i}}">
               <div formArrayName="recurrences"
-                   *ngFor="let recurrence of val.get('recurrences').controls; let j = index">
+                   *ngFor="let recurrence of val.get('recurrences')['controls']; let j = index">
                 <div [formGroupName]="j">
                   <app-cron-jobs [formControl]="recurrence" [config]="cronConfig"></app-cron-jobs>
                 </div>
